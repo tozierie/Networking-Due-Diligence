@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Due Diligence Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:     #0D1B2A;
+    --blue:     #1A4A7A;
+    --teal:     #0E7C7B;
+    --amber:    #E8A838;
+    --white:    #F8FBFF;
+    --gray-50:  #F0F4F8;
+    --gray-100: #DDE4EE;
+    --gray-400: #8A97AA;
+    --gray-700: #3D4F63;
+    --red:      #C0392B;
+    --green:    #1A7A4A;
+    --text:     #1A2535;
+
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; }
+
+  /* ── Top Bar ── */
+  .topbar { background: var(--navy); padding: 14px 28px; display: flex; align-items: center; gap: 14px; border-bottom: 2px solid var(--teal); position: sticky; top: 0; z-index: 200; flex-wrap: wrap; }
+  .topbar-logo { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--teal); letter-spacing: .12em; text-transform: uppercase; line-height: 1.3; }
+  .topbar-title { font-size: 14px; font-weight: 600; color: var(--white); letter-spacing: .02em; }
+  .topbar-meta { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .progress-pill { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: var(--white); font-size: 11px; font-family: 'IBM Plex Mono', monospace; padding: 4px 11px; border-radius: 20px; white-space: nowrap; }
+  .btn { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 6px 15px; border-radius: 4px; border: none; cursor: pointer; transition: opacity .15s; white-space: nowrap; }
+  .btn:hover { opacity: .82; }
+  .btn-teal  { background: var(--teal); color: #fff; }
+  .btn-amber { background: var(--amber); color: var(--navy); }
+  .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,.28); color: var(--white); }
+  #loadFileInput { display: none; }
+
+  /* ── Info Bar ── */
+  .info-bar { background: var(--blue); padding: 12px 28px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .info-field { display: flex; align-items: center; gap: 7px; }
+  .info-field label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); white-space: nowrap; }
+  .info-field input { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 4px; color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; padding: 5px 9px; outline: none; transition: border-color .15s; }
+  .info-field input::placeholder { color: rgba(255,255,255,.32); }
+  .info-field input:focus { border-color: var(--teal); }
+
+  /* ── Main ── */
+  .main { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 18px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 14px rgba(0,0,0,.26); }
+  .section-header { background: var(--blue); padding: 11px 18px; display: flex; align-items: center; gap: 11px; cursor: pointer; user-select: none; }
+  .section-header:hover { background: #1E5494; }
+  .section-icon { font-size: 16px; }
+  .section-title { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--white); flex: 1; }
+  .section-label-input { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: 4px; color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; padding: 4px 9px; outline: none; width: 200px; transition: border-color .15s; }
+  .section-label-input::placeholder { color: rgba(255,255,255,.38); }
+  .section-label-input:focus { border-color: var(--teal); }
+  .section-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(255,255,255,.45); white-space: nowrap; }
+  .chevron { color: rgba(255,255,255,.45); font-size: 11px; transition: transform .2s; }
+  .section.collapsed .chevron { transform: rotate(-90deg); }
+  .section.collapsed .section-body { display: none; }
+
+  /* ── MDF Group ── */
+  .mdf-group { margin-bottom: 24px; }
+  .mdf-group-header { display: flex; align-items: center; gap: 11px; padding: 10px 18px; background: #0A3050; border-radius: 8px 8px 0 0; }
+  .mdf-group-title { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--white); }
+  .mdf-group-subtitle { font-size: 11px; color: rgba(255,255,255,.4); margin-left: 4px; }
+  .mdf-instances { display: flex; flex-direction: column; }
+  .mdf-instances .section { border-radius: 0; margin-bottom: 0; border-top: 1px solid rgba(255,255,255,.07); box-shadow: none; }
+  .mdf-instances .section:last-child { border-radius: 0; }
+  .mdf-group-footer { background: #0A3050; border-radius: 0 0 8px 8px; padding: 10px 18px; display: flex; gap: 10px; align-items: center; border-top: 1px solid rgba(255,255,255,.1); }
+  .btn-remove { background: rgba(192,57,43,.22); border: 1px solid rgba(192,57,43,.38); color: #ffaaaa; font-size: 10px; padding: 4px 11px; border-radius: 4px; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; transition: background .15s; }
+  .btn-remove:hover { background: rgba(192,57,43,.42); }
+
+  /* ── Section Footer (condition rating) ── */
+  .section-footer { background: var(--gray-50); border-top: 2px solid var(--gray-100); padding: 12px 18px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .section-footer label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-400); white-space: nowrap; }
+  .condition-btns { display: flex; gap: 6px; }
+  .cond-btn { font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; transition: all .15s; background: #fff; }
+  .cond-btn.good  { border-color: #27ae60; color: #27ae60; }
+  .cond-btn.fair  { border-color: #e67e22; color: #e67e22; }
+  .cond-btn.poor  { border-color: var(--red); color: var(--red); }
+  .cond-btn.good.active  { background: #27ae60; color: #fff; }
+  .cond-btn.fair.active  { background: #e67e22; color: #fff; }
+  .cond-btn.poor.active  { background: var(--red); color: #fff; }
+  .section-notes-input { flex: 1; min-width: 200px; border: 1px solid var(--gray-100); border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; color: var(--gray-700); padding: 5px 9px; outline: none; background: #fff; transition: border-color .15s; }
+  .section-notes-input:focus { border-color: var(--teal); }
+  .section-notes-input::placeholder { color: var(--gray-400); font-style: italic; font-size: 11px; }
+
+  /* ── Table ── */
+  .section-body { background: #fff; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--gray-50); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-400); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--gray-100); }
+  thead th.center { text-align: center; }
+  tbody tr { border-bottom: 1px solid var(--gray-100); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+  tbody tr.row-done { background: #F0FAF4; }
+  tbody tr.row-done:hover { background: #E6F7ED; }
+
+  td { padding: 8px 12px; vertical-align: middle; font-size: 13px; color: var(--text); line-height: 1.45; }
+  td.center { text-align: center; vertical-align: middle; }
+  td.task-cell { vertical-align: middle; padding: 8px 12px; font-size: 13px; line-height: 1.4; }
+  td.task-capture-col { color: var(--text); }
+  td.task-record-col  { color: var(--teal); font-size: 12.5px; }
+
+  /* ── Checkboxes ── */
+  .custom-check { width: 26px; height: 26px; border: 2px solid var(--gray-100); border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; font-size: 14px; color: transparent; background: #fff; margin: 0 auto; }
+  .custom-check:hover { border-color: var(--teal); }
+  .custom-check.checked { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+  /* ── Timestamp chip ── */
+  .ts-chip { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--gray-400); margin-top: 4px; display: block; }
+
+  /* ── Notes ── */
+  .notes-input { width: 100%; min-height: 32px; border: 1px solid transparent; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; color: var(--gray-700); padding: 5px 7px; resize: vertical; background: transparent; transition: border-color .15s, background .15s; outline: none; }
+  .notes-input:hover { border-color: var(--gray-100); background: var(--gray-50); }
+  .notes-input:focus { border-color: var(--teal); background: #fff; }
+  .notes-input::placeholder { color: var(--gray-400); font-style: italic; font-size: 10px; }
+
+  /* ── Footer actions ── */
+  .footer-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ── Mobile card layout ── */
+  @media (max-width: 680px) {
+    .topbar { padding: 12px 14px; gap: 8px; }
+    .topbar-logo { display: none; }
+    .info-bar { padding: 10px 14px; gap: 12px; }
+    .main { padding: 16px 10px 48px; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tbody tr {
+      margin: 0 0 1px 0;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--gray-100);
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 6px 8px;
+      align-items: center;
+    }
+    tbody tr td { padding: 0; border: none; font-size: 13px; }
+    td.photo-cell         { grid-column: 1; grid-row: 1; }
+    td.task-capture-col   { grid-column: 2; grid-row: 1; align-self: center; }
+    td.doc-cell           { grid-column: 1; grid-row: 2; }
+    td.task-record-col    { grid-column: 2; grid-row: 2; font-size: 12px; color: var(--teal); align-self: center; }
+    td.notes-cell         { grid-column: 1 / 3; grid-row: 3; }
+    .section-footer { padding: 10px 14px; }
+    .section-label-input { width: 150px; }
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; }
+    .topbar, .info-bar, .mdf-group-header, .mdf-group-footer, .section-header, .section-footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .btn, .footer-actions, .btn-remove, #loadFileInput { display: none !important; }
+    .section { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    .section.collapsed .section-body { display: block !important; }
+    .section-label-input { border: none; background: transparent; color: #000; }
+    .topbar-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-logo">Network<br>Due Diligence</div>
+  <div style="width:1px;height:28px;background:rgba(255,255,255,.14)"></div>
+  <div class="topbar-title">On-Site Assessment Checklist</div>
+  <div class="topbar-meta">
+    <span class="progress-pill" id="progressPill">0 / 0 complete</span>
+    <button class="btn btn-ghost" onclick="triggerLoadFile()">↑ Load File</button>
+    <input type="file" id="loadFileInput" accept=".json" onchange="loadFromFile(event)">
+    <button class="btn btn-ghost" onclick="window.print()">⎙ Print</button>
+    <button class="btn btn-teal" onclick="saveProgress()">↓ Save</button>
+    <button class="btn btn-amber" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<!-- Property Info -->
+<div class="info-bar">
+  <div class="info-field">
+    <label>Property</label>
+    <input type="text" id="propName" placeholder="Community / building name" style="width:190px">
+  </div>
+  <div class="info-field">
+    <label>Address</label>
+    <input type="text" id="propAddress" placeholder="Street address" style="width:210px">
+  </div>
+  <div class="info-field">
+    <label>Technician</label>
+    <input type="text" id="techName" placeholder="Your name" style="width:140px">
+  </div>
+  <div class="info-field">
+    <label>Date</label>
+    <input type="date" id="visitDate">
+  </div>
+</div>
+
+<!-- Checklist Root -->
+<div class="main" id="checklistRoot"></div>
+
+<div class="main" style="padding-top:0">
+  <div class="footer-actions">
+    <button class="btn btn-ghost" style="color:var(--white)" onclick="expandAll()">Expand All</button>
+    <button class="btn btn-ghost" style="color:var(--white)" onclick="collapseAll()">Collapse All</button>
+    <button class="btn btn-teal" onclick="saveProgress()">↓ Save Progress</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MDF_ITEMS = [
+  { photo: true, task: "Wide-Angle Photo of the Network Location" },
+  { photo: true, task: "Wide-Angle Photo of Network Rack" },
+  { photo: true, task: "Close-Up Photos of Device Make/Model Information" },
+  { photo: true, task: "Close-Up Photos of Switch Port Configurations" },
+  { photo: true, task: "Photos Showing Interconnections Between Network Devices" },
+  { photo: true, task: "Close-Up Photos of Circuit Identification Tags" },
+];
+
+const SECTIONS = [
+  {
+    id: "wireless", icon: "📡", title: "Wireless Communications",
+    items: [
+      { photo: true, doc: true,  task: "Annotated Photos of Wireless Access Point Locations",       docTask: "Physical Count of All WAPs Including Make/Model" },
+      { photo: true, doc: false, task: "Screenshots of All SSIDs Broadcasted Within the Community" },
+      { photo: true, doc: true,  task: "Guest Wi-Fi Speed Test — Screenshot with Location Label", docTask: "Quality of Wi-Fi Signal — Ask Staff for Speed Test" },
+    ]
+  },
+  {
+    id: "enduser", icon: "💻", title: "End-User Devices & Office Locations",
+    items: [
+      { photo: true, doc: false, task: "Wide-Angle Photos of All Office Areas" },
+      { photo: true, doc: true,  task: "Annotated Photos of All Workstations with Position Labels", docTask: "Physically Count Laptops and Desktops, Make/Model" },
+      { photo: true, doc: true,  task: "Annotated Photo of All Printers with Location Labels",      docTask: "Capture Network Speed Test Upload/Download" },
+      { photo: true, doc: true,  task: "Photos Showing Network Connections to End Devices",         docTask: "Physically Count Phones for Staff" },
+      { photo: true, doc: false, task: "Photo of Guest Services: Business Center, Printer, Coffee Station" },
+      { photo: true, doc: false, task: "Wide-Angle Photos of Gym Equipment and Connection Types" },
+    ]
+  },
+  {
+    id: "emergency", icon: "🚨", title: "Emergency Services",
+    items: [
+      { photo: true, doc: false, task: "Wide-Angle Photo of All Elevators",       docTask: "Verify Elevator Phone Connectivity" },
+      { photo: true, doc: false, task: "Close-Up Photos of Elevator Service Tag" },
+      { photo: true, doc: false, task: "Wide-Angle Photo of All Pools",           docTask: "Verify Pool Phone Connectivity" },
+      { photo: true, doc: false, task: "Wide-Angle Photo of Each Emergency Phone" },
+    ]
+  },
+  {
+    id: "av", icon: "🎵", title: "Audio / Video Service",
+    items: [
+      { photo: true, doc: false, task: "Wide-Angle Photo of All Media Rooms & Entertainment Centers" },
+      { photo: true, doc: true,  task: "Close-Up Photo of All Audio Systems with Location Labels", docTask: "System Assessment — Does It Work, How Well?" },
+      { photo: true, doc: true,  task: "Close-Up Photo of Music Streaming Device",                docTask: "Count All Music Streaming Devices" },
+      { photo: true, doc: true,  task: "Close-Up Photo of Cable Service Provider",                docTask: "Count All Cable Boxes & TVs" },
+    ]
+  }
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let state        = {};   // keyed values: photo bool, doc bool, note string, ts string
+let sectionMeta  = {};   // keyed by sectionId: { condition, note }
+let mdfInstances = [];
+let mdfCounter   = 0;
+
+function mdfKey(iid, idx, type) { return `mdf_${iid}_${idx}_${type}`; }
+function secKey(sid, idx, type)  { return `${sid}_${idx}_${type}`; }
+function smKey(sid)              { return `sm_${sid}`; }
+
+function now() {
+  const d = new Date();
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MDF INSTANCE MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+function addMdfInstance(label) {
+  const id = "mdf" + (++mdfCounter);
+  mdfInstances.push({ id, label: label || "" });
+  renderMdfGroup();
+  updateProgress();
+  autosave();
+}
+
+function removeMdfInstance(id) {
+  if (mdfInstances.length <= 1) { alert("At least one network room entry is required."); return; }
+  if (!confirm("Remove this room entry? Its data will be lost.")) return;
+  mdfInstances = mdfInstances.filter(m => m.id !== id);
+  Object.keys(state).forEach(k => { if (k.startsWith("mdf_" + id + "_")) delete state[k]; });
+  renderMdfGroup();
+  updateProgress();
+  autosave();
+}
+
+function updateMdfLabel(id, value) {
+  const inst = mdfInstances.find(m => m.id === id);
+  if (inst) inst.label = value;
+  autosave();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER MDF GROUP
+// ─────────────────────────────────────────────────────────────────────────────
+function renderMdfGroup() {
+  const root = document.getElementById("mdfGroupContainer");
+  if (!root) return;
+  root.innerHTML = "";
+
+  mdfInstances.forEach((inst, instIdx) => {
+    const sec = document.createElement("div");
+    sec.className = "section";
+    sec.id = "sec_" + inst.id;
+
+    const hdr = document.createElement("div");
+    hdr.className = "section-header";
+    hdr.innerHTML = `
+      <span class="section-icon">🖧</span>
+      <input class="section-label-input" type="text" placeholder="Room label (e.g. MDF – Floor 1)"
+        value="${escHtml(inst.label)}"
+        onclick="event.stopPropagation()"
+        oninput="updateMdfLabel('${inst.id}', this.value)">
+      <span class="section-count" id="cnt_${inst.id}"></span>
+      <span class="chevron">▼</span>`;
+    hdr.addEventListener("click", () => toggleSection(inst.id));
+
+    const body = document.createElement("div");
+    body.className = "section-body";
+
+    let html = buildTableHead();
+    html += "<tbody>";
+    MDF_ITEMS.forEach((item, idx) => {
+      html += buildRow("mdf", inst.id, idx, item);
+    });
+    html += "</tbody></table>";
+
+    // Section footer — condition + notes
+    html += buildSectionFooter("mdf_" + inst.id);
+    body.innerHTML = html;
+
+    const rmBar = document.createElement("div");
+    rmBar.style.cssText = "background:#0a3050;padding:7px 18px;display:flex;justify-content:flex-end;border-top:1px solid rgba(255,255,255,.07)";
+    rmBar.innerHTML = `<button class="btn-remove" onclick="removeMdfInstance('${inst.id}')">✕ Remove This Room</button>`;
+
+    sec.appendChild(hdr);
+    sec.appendChild(body);
+    if (mdfInstances.length > 1) sec.appendChild(rmBar);
+    root.appendChild(sec);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+function buildTableHead() {
+  return `<table><thead><tr>
+    <th class="center" style="width:52px">📷</th>
+    <th>Capture</th>
+    <th class="center" style="width:52px">📋</th>
+    <th>Record</th>
+    <th>Field Notes</th>
+  </tr></thead>`;
+}
+
+function buildRow(type, scopeId, idx, item) {
+  const photoKey = type === "mdf" ? mdfKey(scopeId, idx, "photo") : secKey(scopeId, idx, "photo");
+  const docKey   = type === "mdf" ? mdfKey(scopeId, idx, "doc")   : secKey(scopeId, idx, "doc");
+  const noteKey  = type === "mdf" ? mdfKey(scopeId, idx, "note")  : secKey(scopeId, idx, "note");
+  const tsKey    = type === "mdf" ? mdfKey(scopeId, idx, "ts")    : secKey(scopeId, idx, "ts");
+
+  const photoCked = state[photoKey] ? "checked" : "";
+  const docCked   = state[docKey]   ? "checked" : "";
+  const noteVal   = escHtml(state[noteKey] || "");
+  const tsVal     = state[tsKey] || "";
+  const rowClass  = getRowClass(type, scopeId, idx, item);
+
+  // Capture column: task description
+  const captureCell = `<td class="task-cell task-capture-col">${item.task}</td>`;
+
+  // Photo checkbox column
+  const photoCol = `<td class="center photo-cell">
+    <div class="custom-check ${photoCked}" onclick="toggleField('${type}','${scopeId}',${idx},'photo')" title="Photo captured">✓</div>
+    ${tsVal ? `<span class="ts-chip">${tsVal}</span>` : ""}
+  </td>`;
+
+  // Record column: docTask text (same style as task)
+  const recordCell = item.docTask
+    ? `<td class="task-cell task-record-col">${item.docTask}</td>`
+    : `<td class="task-cell task-record-col" style="color:var(--gray-100)">—</td>`;
+
+  // Doc checkbox column
+  const docCol = item.doc
+    ? `<td class="center doc-cell">
+        <div class="custom-check ${docCked}" onclick="toggleField('${type}','${scopeId}',${idx},'doc')" title="Record / count complete">✓</div>
+      </td>`
+    : `<td class="center doc-cell"><span style="color:var(--gray-100);font-size:15px">—</span></td>`;
+
+  return `<tr id="row_${scopeId}_${idx}" class="${rowClass}">
+    ${photoCol}
+    ${captureCell}
+    ${docCol}
+    ${recordCell}
+    <td class="notes-cell">
+      <textarea class="notes-input" placeholder="Notes…" rows="1"
+        onchange="saveFieldNote('${type}','${scopeId}',${idx},this.value)"
+        oninput="autoResize(this)">${noteVal}</textarea>
+    </td>
+  </tr>`;
+}
+
+function buildSectionFooter(scopeId) {
+  const sm = sectionMeta[scopeId] || {};
+  const cond = sm.condition || "";
+  const note = escHtml(sm.note || "");
+  return `<div class="section-footer">
+    <label>Overall Condition</label>
+    <div class="condition-btns">
+      <button class="cond-btn good ${cond==='good'?'active':''}" onclick="setCondition('${scopeId}','good')">Good</button>
+      <button class="cond-btn fair ${cond==='fair'?'active':''}" onclick="setCondition('${scopeId}','fair')">Fair</button>
+      <button class="cond-btn poor ${cond==='poor'?'active':''}" onclick="setCondition('${scopeId}','poor')">Poor</button>
+    </div>
+    <input class="section-notes-input" type="text" placeholder="Section-level notes / observations…"
+      value="${note}"
+      onchange="setSectionNote('${scopeId}', this.value)">
+  </div>`;
+}
+
+function getRowClass(type, scopeId, idx, item) {
+  const photoKey = type === "mdf" ? mdfKey(scopeId, idx, "photo") : secKey(scopeId, idx, "photo");
+  const docKey   = type === "mdf" ? mdfKey(scopeId, idx, "doc")   : secKey(scopeId, idx, "doc");
+  if (state[photoKey] && (!item.doc || state[docKey])) return "row-done";
+  return "";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD FULL CHECKLIST
+// ─────────────────────────────────────────────────────────────────────────────
+function buildChecklist() {
+  const root = document.getElementById("checklistRoot");
+  root.innerHTML = "";
+
+  // MDF group
+  const mdfGroup = document.createElement("div");
+  mdfGroup.className = "mdf-group";
+  mdfGroup.innerHTML = `
+    <div class="mdf-group-header">
+      <span style="font-size:17px">🖧</span>
+      <span class="mdf-group-title">Network Rooms</span>
+      <span class="mdf-group-subtitle">MDF · IDF · MPOE — one entry per closet</span>
+    </div>
+    <div class="mdf-instances" id="mdfGroupContainer"></div>
+    <div class="mdf-group-footer">
+      <button class="btn btn-teal" style="font-size:10px;padding:5px 14px" onclick="addMdfInstance('')">+ Add Another Room</button>
+      <span style="font-size:11px;color:rgba(255,255,255,.38)">Add a row for each MDF, IDF, or MPOE closet on the property</span>
+    </div>`;
+  root.appendChild(mdfGroup);
+
+  // Static sections
+  SECTIONS.forEach(section => {
+    const div = document.createElement("div");
+    div.className = "section";
+    div.id = "sec_" + section.id;
+
+    const hdr = document.createElement("div");
+    hdr.className = "section-header";
+    hdr.innerHTML = `
+      <span class="section-icon">${section.icon}</span>
+      <span class="section-title">${section.title}</span>
+      <span class="section-count" id="cnt_${section.id}"></span>
+      <span class="chevron">▼</span>`;
+    hdr.onclick = () => toggleSection(section.id);
+
+    const body = document.createElement("div");
+    body.className = "section-body";
+
+    let html = buildTableHead();
+    html += "<tbody>";
+    section.items.forEach((item, idx) => {
+      html += buildRow("sec", section.id, idx, item);
+    });
+    html += "</tbody></table>";
+    html += buildSectionFooter(section.id);
+    body.innerHTML = html;
+
+    div.appendChild(hdr);
+    div.appendChild(body);
+    root.appendChild(div);
+  });
+
+  renderMdfGroup();
+  updateProgress();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleField(type, scopeId, idx, field) {
+  const key = type === "mdf" ? mdfKey(scopeId, idx, field) : secKey(scopeId, idx, field);
+  const tsKey = type === "mdf" ? mdfKey(scopeId, idx, "ts") : secKey(scopeId, idx, "ts");
+  state[key] = !state[key];
+  // Stamp time on first photo check
+  if (field === "photo" && state[key] && !state[tsKey]) state[tsKey] = now();
+  if (field === "photo" && !state[key]) delete state[tsKey];
+  refreshRow(type, scopeId, idx);
+  updateProgress();
+  autosave();
+}
+
+
+function saveFieldNote(type, scopeId, idx, value) {
+  const key = type === "mdf" ? mdfKey(scopeId, idx, "note") : secKey(scopeId, idx, "note");
+  state[key] = value;
+  autosave();
+}
+
+function setCondition(scopeId, value) {
+  if (!sectionMeta[scopeId]) sectionMeta[scopeId] = {};
+  sectionMeta[scopeId].condition = (sectionMeta[scopeId].condition === value) ? "" : value;
+  // Re-render the footer buttons only
+  refreshSectionFooter(scopeId);
+  autosave();
+}
+
+function setSectionNote(scopeId, value) {
+  if (!sectionMeta[scopeId]) sectionMeta[scopeId] = {};
+  sectionMeta[scopeId].note = value;
+  autosave();
+}
+
+function refreshRow(type, scopeId, idx) {
+  const items = type === "mdf" ? MDF_ITEMS : SECTIONS.find(s => s.id === scopeId).items;
+  const item  = items[idx];
+  const row   = document.getElementById(`row_${scopeId}_${idx}`);
+  if (!row) return;
+
+  const photoKey = type === "mdf" ? mdfKey(scopeId, idx, "photo") : secKey(scopeId, idx, "photo");
+  const docKey   = type === "mdf" ? mdfKey(scopeId, idx, "doc")   : secKey(scopeId, idx, "doc");
+  const tsKey    = type === "mdf" ? mdfKey(scopeId, idx, "ts")    : secKey(scopeId, idx, "ts");
+
+  row.className = getRowClass(type, scopeId, idx, item);
+
+  const checks = row.querySelectorAll(".custom-check");
+  if (checks[0]) checks[0].className = "custom-check" + (state[photoKey] ? " checked" : "");
+  if (checks[1]) checks[1].className = "custom-check" + (state[docKey]   ? " checked" : "");
+
+  const chip = row.querySelector(".ts-chip");
+  if (chip) { chip.textContent = state[tsKey] || ""; chip.style.display = state[tsKey] ? "block" : "none"; }
+  else if (state[tsKey]) {
+    const wrap = row.querySelector(".check-wrap");
+    if (wrap) { const s = document.createElement("span"); s.className = "ts-chip"; s.textContent = state[tsKey]; wrap.appendChild(s); }
+  }
+}
+
+function refreshSectionFooter(scopeId) {
+  // Find all condition buttons in the footer for this scope
+  const sm = sectionMeta[scopeId] || {};
+  const cond = sm.condition || "";
+  // Find section body — could be mdf_ or normal section
+  const domId = scopeId.startsWith("mdf_") ? "sec_" + scopeId.replace("mdf_","") : "sec_" + scopeId;
+  // Actually sectionMeta keyed by scopeId which for mdf is "mdf_mdf1", for static is "wireless" etc
+  // We need to find the footer in the right section
+  // For static sections:
+  let secEl = document.getElementById("sec_" + scopeId);
+  if (!secEl && scopeId.startsWith("mdf_")) {
+    // mdf scope id is like "mdf_mdf1"
+    const instId = scopeId.replace(/^mdf_/, "");
+    secEl = document.getElementById("sec_" + instId);
+  }
+  if (!secEl) return;
+  const btns = secEl.querySelectorAll(".cond-btn");
+  btns.forEach(b => {
+    b.classList.toggle("active", b.classList.contains(cond));
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────────────────────────────────────
+function updateProgress() {
+  let total = 0, done = 0;
+
+  mdfInstances.forEach(inst => {
+    let st = 0, sd = 0;
+    MDF_ITEMS.forEach((item, idx) => {
+      const k = mdfKey(inst.id, idx, "photo");
+      total++; st++;
+      if (state[k]) { done++; sd++; }
+    });
+    const cnt = document.getElementById("cnt_" + inst.id);
+    if (cnt) cnt.textContent = `${sd} / ${st}`;
+  });
+
+  SECTIONS.forEach(section => {
+    let st = 0, sd = 0;
+    section.items.forEach((item, idx) => {
+      const pk = secKey(section.id, idx, "photo");
+      const dk = secKey(section.id, idx, "doc");
+      if (item.photo) { total++; st++; if (state[pk]) { done++; sd++; } }
+      if (item.doc)   { total++; st++; if (state[dk]) { done++; sd++; } }
+    });
+    const cnt = document.getElementById("cnt_" + section.id);
+    if (cnt) cnt.textContent = `${sd} / ${st}`;
+  });
+
+  document.getElementById("progressPill").textContent = `${done} / ${total} complete`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COLLAPSE / EXPAND
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleSection(id) { document.getElementById("sec_" + id)?.classList.toggle("collapsed"); }
+function expandAll() {
+  mdfInstances.forEach(m => document.getElementById("sec_"+m.id)?.classList.remove("collapsed"));
+  SECTIONS.forEach(s => document.getElementById("sec_"+s.id)?.classList.remove("collapsed"));
+}
+function collapseAll() {
+  mdfInstances.forEach(m => document.getElementById("sec_"+m.id)?.classList.add("collapsed"));
+  SECTIONS.forEach(s => document.getElementById("sec_"+s.id)?.classList.add("collapsed"));
+}
+
+function autoResize(el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
+function escHtml(s) { return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SAVE / LOAD
+// ─────────────────────────────────────────────────────────────────────────────
+function saveProgress() {
+  const data = {
+    propName:    document.getElementById("propName").value,
+    propAddress: document.getElementById("propAddress").value,
+    techName:    document.getElementById("techName").value,
+    visitDate:   document.getElementById("visitDate").value,
+    mdfInstances, mdfCounter, checks: state, sectionMeta
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  const prop = data.propName ? data.propName.replace(/\s+/g, "_") : "checklist";
+  a.download = `${prop}_network_checklist.json`;
+  a.click();
+}
+
+function triggerLoadFile() { document.getElementById("loadFileInput").click(); }
+
+function loadFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!confirm("Load saved file? This will replace your current progress.")) return;
+      applyData(data);
+      buildChecklist();
+      autosave();
+    } catch(err) {
+      alert("Could not read that file. Please make sure it is a valid checklist JSON file.");
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+function applyData(data) {
+  state        = data.checks       || {};
+  sectionMeta  = data.sectionMeta  || {};
+  mdfInstances = data.mdfInstances || [];
+  mdfCounter   = data.mdfCounter   || mdfInstances.length;
+  if (mdfInstances.length === 0) mdfInstances.push({ id: "mdf" + (++mdfCounter), label: "" });
+  document.getElementById("propName").value    = data.propName    || "";
+  document.getElementById("propAddress").value = data.propAddress || "";
+  document.getElementById("techName").value    = data.techName    || "";
+  document.getElementById("visitDate").value   = data.visitDate   || "";
+}
+
+function autosave() {
+  try {
+    const data = {
+      propName:    document.getElementById("propName").value,
+      propAddress: document.getElementById("propAddress").value,
+      techName:    document.getElementById("techName").value,
+      visitDate:   document.getElementById("visitDate").value,
+      mdfInstances, mdfCounter, checks: state, sectionMeta
+    };
+    localStorage.setItem("ndd_v3", JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadAutosaved() {
+  try {
+    const raw = localStorage.getItem("ndd_v3");
+    if (!raw) return false;
+    applyData(JSON.parse(raw));
+    return mdfInstances.length > 0;
+  } catch(e) { return false; }
+}
+
+function resetAll() {
+  if (!confirm("Reset everything? All progress will be cleared.")) return;
+  state = {}; sectionMeta = {}; mdfInstances = []; mdfCounter = 0;
+  document.getElementById("propName").value    = "";
+  document.getElementById("propAddress").value = "";
+  document.getElementById("techName").value    = "";
+  document.getElementById("visitDate").value   = new Date().toISOString().slice(0,10);
+  localStorage.removeItem("ndd_v3");
+  mdfInstances.push({ id: "mdf" + (++mdfCounter), label: "" });
+  buildChecklist();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+["propName","propAddress","techName","visitDate"].forEach(id => {
+  document.getElementById(id).addEventListener("input", autosave);
+});
+
+document.getElementById("visitDate").value = new Date().toISOString().slice(0,10);
+const hadSaved = loadAutosaved();
+if (!hadSaved) mdfInstances.push({ id: "mdf" + (++mdfCounter), label: "" });
+buildChecklist();
+</script>
+</body>
+</html>
